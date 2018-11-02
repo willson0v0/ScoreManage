@@ -6,16 +6,17 @@ struct record
 {
     int score;
     int number;
+    char* name;
 };
 
 struct recList
 {
     struct record** data;
     int capacity;
-    int size;
+    int listSize;
 };
 
-struct record* stuConstructor(int score, int number);
+struct record* recConstructor(int score, int number);
 struct recList* listConstructor();
 
 int numSorter(struct record* a, struct record* b);
