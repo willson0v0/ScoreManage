@@ -12,14 +12,23 @@
 
 1540969848 c:\users\gs63vr\onedrive\hitsz\2018-19\高级语言程序设计\实验课\6班-180110618-黎庚祉-实验五\5\5.1_score_management\header.h
 
-1540977451 source:f:\cbproject\5.1_score_management\main.c
-	<stdlib.h>
+1541438243 source:f:\cbproject\5.1_score_management\main.c
 	<header.h>
 
-1540976001 f:\cbproject\5.1_score_management\header.h
+1541434049 f:\cbproject\5.1_score_management\header.h
+	<windows.h>
+	<conio.h>
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
 
 1541143671 source:c:\users\administrator\desktop\5.1_score_management\main.c
 	<stdio.h>
 	<stdlib.h>
 	<string.h>
+
+1541228390 source:f:\cbproject\5.1_score_management\header.h
+
+1541438568 source:f:\cbproject\5.1_score_management\functions.c
+	<header.h>
 
