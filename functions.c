@@ -19,7 +19,8 @@ void (*func[])(RecList* a) =
     searchByName,
     statisticAnalysis,
     printTable,
-    writeToFile
+    writeToFile,
+    readFromFile
 };
 
 /*
@@ -49,11 +50,11 @@ Record* recConstructor(int number,int* score, char* name)
 RecList* listConstructor()
 {
     RecList* list = (RecList*)malloc(sizeof(RecList));
-    nullCheck(list, "listConstructor");//check if malloc failed.
-    list->capacity = INIT_CAPACITY;//initial capacity of the array
+    nullCheck(list, "listConstructor");        //check if malloc failed.
+    list->capacity = INIT_CAPACITY;             //initial capacity of the array
     list->listSize = 0;
     list->data = (Record**)malloc(sizeof(Record*)*list->capacity);
-    nullCheck(list->data,"listConstructor");//check if malloc failed.
+    nullCheck(list->data,"listConstructor");    //check if malloc failed.
 
     return list;
 }
@@ -83,6 +84,16 @@ void listDeconstructor(RecList* toDestroy)
     }
     free(toDestroy->data);
     free(toDestroy);
+}
+
+void freeSubjectNames()
+{
+    for(int i=0;i<subjectCount;i++)
+    {
+        free(subjectName[i]);
+    }
+    free(subjectName);
+    subjectCount = -1;
 }
 
 /*
@@ -477,11 +488,11 @@ void searchByName(RecList* table)
  */
 void statisticAnalysis(RecList* table)
 {
-    int **count = (int**)malloc(5*sizeof(int*));
-    for(int i=0; i<5; i++)
+    int **count = (int**)malloc(subjectCount*sizeof(int*));
+    for(int i=0; i<subjectCount; i++)
     {
-        count[i] = (int*)malloc(sizeof(int)*subjectCount);
-        for(int j=0; j<subjectCount; j++)
+        count[i] = (int*)malloc(sizeof(int)*5);
+        for(int j=0; j<5; j++)
         {
             count[i][j]=0;
         }
@@ -491,7 +502,7 @@ void statisticAnalysis(RecList* table)
         for(int j=0; j<subjectCount; j++)
         {
             int curScore = table->data[i]->score[j];
-            count[curScore<=50? 0 : (curScore-50)/10][j]++;
+            count[j][curScore<=50? 0 : (curScore==100? 4 : (curScore-50)/10)]++;
         }
     }
     printf("Analysis:\n");
@@ -500,9 +511,15 @@ void statisticAnalysis(RecList* table)
         printf("%s\n", subjectName[i]);
         for(int j =4; j>=0; j--)
         {
-            printf("\t%c: %d students,\t%6.2f%%\n", 'E'-j, count[j][i], count[j][i]/(double)table->listSize*100);
+            printf("\t%c: %3d students,\t%6.2f%%\n", 'E'-j, count[i][j], count[i][j]/(double)table->listSize*100);
         }
     }
+
+    for(int i=0;i<subjectCount;i++)
+    {
+        free(count[i]);
+    }
+    free(count);
 }
 
 /*
@@ -535,6 +552,8 @@ void writeToFile(RecList* toSave)
     }
     fclose(file);
     free(name);
+
+    colorPrinter(FOREGROUND_GREEN, "Completed\n");
 }
 
 /*
@@ -545,21 +564,47 @@ void writeToFile(RecList* toSave)
 void readFromFile(RecList* toStore)
 {
     char* fName = malloc(MAX_ADDR*sizeof(char));
-    system("dir");
+    int isAppend = subjectCount!=-1;
+    int fileSubCount;
+    char** fileSubName;
+    FILE* file;
+
+    system("dir /A:-D /B");
     printf("\n\nPlease input file name: ");
+
     fflush(stdin);
     gets(fName);
-    FILE* file = fopen(fName, "r");
-    nullCheck(file, "read from file");
-    fscanf(file, "%d", &subjectCount);
-    subjectName = (char**)malloc(sizeof(char*)*subjectCount);
+    file = fopen(fName, "r");
+
+    while(file == NULL)
+    {
+        colorPrinter(FOREGROUND_RED, "Unable to open the file. Please try again.\n");
+        system("dir /A:-D /B");
+        printf("\nPlease input file name: ");
+        fflush(stdin);
+        gets(fName);
+        file = fopen(fName, "r");
+    }
+
+    if(fscanf(file, "%d", &fileSubCount)!=1 || (isAppend && fileSubCount!=subjectCount)) goto ERR;
+    subjectCount = fileSubCount;
+
+    fileSubName = (char**)malloc(sizeof(char*)*subjectCount);
     for(int i =0; i<subjectCount; i++)
     {
-        subjectName[i] = malloc(MAX_NAME_LENGTH*sizeof(char));
-        fscanf(file, "%s", subjectName[i]);
+        fileSubName[i] = malloc(MAX_NAME_LENGTH*sizeof(char));
+        if(fscanf(file, "%s", fileSubName[i])!=1 || (isAppend && strcmp(fileSubName[i],subjectName[i])!=0)) goto ERR;
     }
+
+    if(!isAppend)
+    {
+        subjectName = fileSubName;
+    }
+
     int size;
-    fscanf(file, "%d", &size);
+
+    if(fscanf(file, "%d", &size)!=1) goto ERR;
+
     for(int i =0; i<size; i++)
     {
         int num, *scores;
@@ -568,17 +613,28 @@ void readFromFile(RecList* toStore)
         fgetc(file);
         fgets(name,MAX_NAME_LENGTH-1, file);
         name[strlen(name)-1]='\0';
-        fscanf(file, "%d", &num);
+
+        if(fscanf(file, "%d", &num)!=1) goto ERR;
+
         for(int j=0; j<subjectCount; j++)
         {
-            fscanf(file, "%d", &scores[j]);
+            if(fscanf(file, "%d", &scores[j])!=1) goto ERR;
         }
         Record* cur = recConstructor(num, scores, name);
         pushBackRec(toStore, cur);
     }
-    fclose(file);
     system("cls");
+    printf("Number: 180110618\nSubject: 5 - Program 1\n\n");
     printTable(toStore);
+
+    fclose(file);
+    free(fName);
+    return;
+
+    ERR:
+        colorPrinter(FOREGROUND_RED, "Format err!\n");
+        readFromFile(toStore);
+        return;
 }
 
 /*

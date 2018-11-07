@@ -7,7 +7,7 @@
 #include <string.h>
 #define INIT_CAPACITY 16
 #define MAX_NAME_LENGTH 30
-#define FUNC_COUNT 12
+#define FUNC_COUNT 13
 #define MAX_ADDR 100
 
 typedef struct
@@ -40,6 +40,7 @@ void qSort(RecList* toSort, int (*sorter)(Record* a, Record* b), int start, int 
 void listDeconstructor(RecList* toDestroy);
 void colorPrinter(WORD color, char* content);
 void pause();
+void freeSubjectNames();
 
 void getInput(RecList* toAppend);
 void printTable(RecList* toPrint);

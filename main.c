@@ -1,5 +1,4 @@
 #include <header.h>
-#include <functions.c>
 
 extern int subjectCount;
 extern char** subjectName;
@@ -20,12 +19,14 @@ char* funcList[] = {"1  Input record",
                     "10 Statistic analysis",
                     "11 List record",
                     "12 Write to File",
+                    "13 Read from file and append to current list",
                     "Q. quit."
                    };
 
 int main()
 {
     printf("Number: 180110618\nSubject: 5 - Program 1\n\n");
+
     int input, curList = 0,initFlag=0;
     char rf;
     RecList* myList = listConstructor();
@@ -33,12 +34,15 @@ int main()
     hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
     GetConsoleScreenBufferInfo(hConsole, &consoleInfo);
     saved_attributes = consoleInfo.wAttributes;
+    subjectCount=-1;
 
     printf("Do you wish to read from file?[y/N]");
     fflush(stdin);
     rf = getch();
     if(rf!='y'&&rf!='Y')
     {
+        system("cls");
+        printf("Number: 180110618\nSubject: 5 - Program 1\n\n");
         printf("Please input subject count: ");
         safeNumInput(&subjectCount);
 
@@ -55,6 +59,7 @@ int main()
     else
     {
         system("cls");
+        printf("Number: 180110618\nSubject: 5 - Program 1\n\n");
         readFromFile(myList);
         initFlag=1;
     }
@@ -65,13 +70,18 @@ int main()
         while(1)
         {
             system("cls");
+            printf("Number: 180110618\nSubject: 5 - Program 1\n\n");
             printf("Use arrow key to select from menu:\n");
             for(int i=0; i<=FUNC_COUNT; i++)
             {
-                printf("%s", funcList[i]);
                 if(i==curList)
                 {
-                    colorPrinter(FOREGROUND_GREEN, "\r>>");
+                    colorPrinter(FOREGROUND_GREEN, funcList[i]);
+                    colorPrinter(FOREGROUND_GREEN, "\r>> ");
+                }
+                else
+                {
+                    printf("%s", funcList[i]);
                 }
                 printf("\n");
             }
@@ -103,7 +113,7 @@ int main()
             {
                 colorPrinter(FOREGROUND_GREEN, "BYE!");
                 fflush(stdin);
-                getchar();
+                getch();
                 return 0;
             }
         }
@@ -121,5 +131,6 @@ int main()
         (*func[input])(myList);
     }
     listDeconstructor(myList);
+    freeSubjectNames();
     return 0;
 }
