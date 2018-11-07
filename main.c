@@ -1,4 +1,5 @@
 #include <header.h>
+#include <functions.c>
 
 extern int subjectCount;
 extern char** subjectName;
@@ -19,14 +20,13 @@ char* funcList[] = {"1  Input record",
                     "10 Statistic analysis",
                     "11 List record",
                     "12 Write to File",
-                    "13 Read from File",
                     "Q. quit."
                    };
 
 int main()
 {
     printf("Number: 180110618\nSubject: 5 - Program 1\n\n");
-    int inputFlag=0, input, screenShotMode, curList = 0,initFlag=0;
+    int input, screenShotMode, curList = 0,initFlag=0;
     char ssm,rf;
     RecList* myList = listConstructor();
 
@@ -45,7 +45,7 @@ int main()
     {
         initFlag=1;
         printf("Please input subject count: ");
-        saveNumInput(&subjectCount);
+        safeNumInput(&subjectCount);
 
         getchar();
         printf("Please input subject names\n");
@@ -56,6 +56,11 @@ int main()
             subjectName[i] = (char*)malloc(sizeof(char)*MAX_NAME_LENGTH);
             gets(subjectName[i]);
         }
+    }
+    else
+    {
+        readFromFile(myList);
+        initFlag = 1;
     }
     while(1)
     {
@@ -104,24 +109,15 @@ int main()
             else
             {
                 colorPrinter(FOREGROUND_GREEN, "BYE!");
-                exit(1);
+                system("pause");
+                return 0;
             }
         }
-        if(input==12)
+        if(input==0)
         {
-            initFlag=1;
-            inputFlag=1;
+            initFlag = 1;
         }
         else if(initFlag==0)
-        {
-            printf("please init the table first!\n");
-            continue;
-        }
-        else if(input==0)
-        {
-            inputFlag = 1;
-        }
-        else if(inputFlag==0)
         {
             printf("please init the table first!\n");
             continue;
@@ -132,7 +128,6 @@ int main()
         }
         (*func[input])(myList);
     }
-
     listDeconstructor(myList);
     return 0;
 }

@@ -14,13 +14,12 @@ void (*func[])(RecList* a) =
     scoreDescendingSort,
     scoreAscendSort,
     numSort,
-    nameAscendSort,
+    nameSort,
     searchByNum,
     searchByName,
     statisticAnalysis,
     printTable,
-    writeToFile,
-    readFromFile
+    writeToFile
 };
 
 /*
@@ -60,7 +59,9 @@ RecList* listConstructor()
 }
 
 /*
- *
+ * Construct a new instance of record
+ * Return:
+ *      A new instance of record.
  */
 void recDeconstructor(Record* toDestroy)
 {
@@ -70,7 +71,9 @@ void recDeconstructor(Record* toDestroy)
 }
 
 /*
- *
+ * Construct a new instance of list
+ * Return:
+ *      A new instance of list.
  */
 void listDeconstructor(RecList* toDestroy)
 {
@@ -82,7 +85,12 @@ void listDeconstructor(RecList* toDestroy)
     free(toDestroy);
 }
 
-
+/*
+ * Print messages with color
+ * Parameter:
+ *      color:      Pre-defined color code
+ *      content:    msg to print
+ */
 void colorPrinter(WORD color, char* content)
 {
     SetConsoleTextAttribute(hConsole, color|FOREGROUND_INTENSITY);
@@ -107,7 +115,12 @@ inline void nullCheck(void* ptr, char* errMsg)
     }
 }
 
-void saveNumInput(int* in)
+/*
+ * Num input with err check. Make user to input again if was invalid.
+ * Parameter:
+ *      in:     Where to store the input
+ */
+void safeNumInput(int* in)
 {
     while(scanf("%d", in)!=1)
     {
@@ -149,7 +162,7 @@ void getInput(RecList* toAppend)
         int* score = (int*)malloc(sizeof(int)*subjectCount);
         char* name = (char*)malloc(sizeof(char)*MAX_NAME_LENGTH);
         printf("Please input Student number: ");
-        saveNumInput(&stuNum);
+        safeNumInput(&stuNum);
 
         if(!stuNum)
         {
@@ -163,7 +176,7 @@ void getInput(RecList* toAppend)
         for(int i =0; i<subjectCount; i++)
         {
             printf("Please input Student's score of %s: ", subjectName[i]);
-            saveNumInput(&score[i]);
+            safeNumInput(&score[i]);
         }
         pushBackRec(toAppend, recConstructor(stuNum, score, name));
         printf("Record added: number = %d & name = %s\n", stuNum, name);
@@ -175,17 +188,19 @@ void getInput(RecList* toAppend)
 
 /*
  * Print an given list like this:
- *      +---------------+---------------+-----+
- *      |           Name|    Student No.|Score|
- *      +---------------+---------------+-----+
- *      |XXXX           |           XXXX|   XX|
- *      +---------------+---------------+-----+
- *      |XXXX           |           XXXX|   XX|
- *      +---------------+---------------+-----+
- *      |XXXX           |           XXXX|   XX|
- *      +---------------+---------------+-----+
- *      |XXXX           |           XXXX|   XX|
- *      +---------------+---------------+-----+
+ *      +---------------+---------------+-------------+---------------+---------------+---------------+
+ *      |           Name|    Student No.|      Chinese|            ...|            Sum|           Avg.|
+ *      +---------------+---------------+-------------+---------------+---------------+---------------+
+ *      |XXXX           |           XXXX|           XX|            ...|             XX|             XX|
+ *      +---------------+---------------+-------------+---------------+---------------+---------------+
+ *      |XXXX           |           XXXX|           XX|            ...|             XX|             XX|
+ *      +---------------+---------------+-------------+---------------+---------------+---------------+
+ *      |XXXX           |           XXXX|           XX|            ...|             XX|             XX|
+ *      +---------------+---------------+-------------+---------------+---------------+---------------+
+ *      |XXXX           |           XXXX|           XX|            ...|             XX|             XX|
+ *      +---------------+---------------+-------------+---------------+---------------+---------------+
+ *      |XXXX           |           XXXX|           XX|            ...|             XX|             XX|
+ *      +---------------+---------------+-------------+---------------+---------------+---------------+
  * Parameter:
  *      toPrint:   Given list.
  */
@@ -231,7 +246,11 @@ void printTable(RecList* toPrint)
     simpleStatistic(toPrint);
 }
 
-
+/*
+ * A shorter version of printTable(), only print the num,sum & avg.
+ * Parameter:
+ *      toPrint:     the table to print
+ */
 void printRecStat(RecList* toPrint)
 {
     printf("+---------------+---------------+----------+----------+\n"
@@ -283,14 +302,21 @@ void scoreAscendSort(RecList* toSort)
 }
 
 /*
- *
+ * Sort an given list by student name.
+ * Parameter:
+ *      toSort:   Given list.
  */
-void nameAscendSort(RecList* toSort)
+void nameSort(RecList* toSort)
 {
     qSort(toSort, nameIncreaseSorter, 0, toSort->listSize);
     printTable(toSort);
 }
 
+/*
+ * Calculate the sum of a student.
+ * Parameter:
+ *      scoreArray: student's scores.
+ */
 int getTotalScore(int* scoreArray)
 {
     int sum = 0;
@@ -304,25 +330,10 @@ int getTotalScore(int* scoreArray)
 /*
  * Different sorting rules.
  */
-int numSorter(Record* a, Record* b)
-{
-    return a->number < b->number;
-}
-
-int scoreDesendSorter(Record* a, Record* b)
-{
-    return getTotalScore(a->score)>getTotalScore(b->score);
-}
-
-int scoreIncreaseSorter(Record* a, Record* b)
-{
-    return getTotalScore(a->score)<getTotalScore(b->score);
-}
-
-int nameIncreaseSorter(Record* a, Record* b)
-{
-    return strcmp(a->name, b->name)<0;
-}
+int numSorter(Record* a, Record* b){return a->number < b->number;}
+int scoreDesendSorter(Record* a, Record* b){return getTotalScore(a->score)>getTotalScore(b->score);}
+int scoreIncreaseSorter(Record* a, Record* b){return getTotalScore(a->score)<getTotalScore(b->score);}
+int nameIncreaseSorter(Record* a, Record* b){return strcmp(a->name, b->name)<0;}
 
 /*
  * Sort a part of the given list via quickSort by given sorting rule.
@@ -419,6 +430,11 @@ void searchByNum(RecList* table)
     }
 }
 
+/*
+ * Search record by name.
+ * Parameter:
+ *      table:  the table to search
+ */
 void searchByName(RecList* table)
 {
     int flag=1;
@@ -438,7 +454,8 @@ void searchByName(RecList* table)
         {
             if(strcmp(table->data[i]->name, input)==0)
             {
-                printf("Record Found: %s, N0.%d, score:\n",table->data[i]->name, table->data[i]->number);
+                colorPrinter(FOREGROUND_GREEN, "Record Found: ");
+                printf("%s, N0.%d, score:\n",table->data[i]->name, table->data[i]->number);
                 for(int j=0; j<subjectCount; j++)
                 {
                     printf("\t%15s: %d\n", subjectName[j], table->data[i]->score[j]);
@@ -455,6 +472,8 @@ void searchByName(RecList* table)
 
 /*
  * Print statistic analysis of the list
+ * Parameter:
+ *      table:  the table to analyze
  */
 void statisticAnalysis(RecList* table)
 {
@@ -486,6 +505,11 @@ void statisticAnalysis(RecList* table)
     }
 }
 
+/*
+ * Save current list to a file.
+ * Parameter:
+ *      toSave: current list.
+ */
 void writeToFile(RecList* toSave)
 {
     char* name = malloc(MAX_ADDR*sizeof(char));
@@ -513,10 +537,15 @@ void writeToFile(RecList* toSave)
     free(name);
 }
 
+/*
+ * Read from a file for list.
+ * Parameter:
+ *      toStore:        the list to store the result
+ */
 void readFromFile(RecList* toStore)
 {
     char* fName = malloc(MAX_ADDR*sizeof(char));
-    system("ls");
+    system("dir");
     printf("\n\nPlease input file name: ");
     fflush(stdin);
     gets(fName);
@@ -524,23 +553,23 @@ void readFromFile(RecList* toStore)
     nullCheck(file, "read from file");
     fscanf(file, "%d", &subjectCount);
     subjectName = (char**)malloc(sizeof(char*)*subjectCount);
-    for(int i =0;i<subjectCount;i++)
+    for(int i =0; i<subjectCount; i++)
     {
         subjectName[i] = malloc(MAX_NAME_LENGTH*sizeof(char));
         fscanf(file, "%s", subjectName[i]);
     }
     int size;
     fscanf(file, "%d", &size);
-    for(int i =0;i<size;i++)
+    for(int i =0; i<size; i++)
     {
         int num, *scores;
         char* name = malloc(sizeof(char)*MAX_NAME_LENGTH);
         scores = malloc(sizeof(int)*subjectCount);
         fgetc(file);
         fgets(name,MAX_NAME_LENGTH-1, file);
-        name[strlen(name)-2]='\0';
+        name[strlen(name)-1]='\0';
         fscanf(file, "%d", &num);
-        for(int j=0;j<subjectCount;j++)
+        for(int j=0; j<subjectCount; j++)
         {
             fscanf(file, "%d", &scores[j]);
         }
@@ -548,12 +577,17 @@ void readFromFile(RecList* toStore)
         pushBackRec(toStore, cur);
     }
     fclose(file);
+    system("cls");
     printTable(toStore);
 }
 
+/*
+ * Eng ver of system("pause");
+ */
 void pause()
 {
     fflush(stdin);
     colorPrinter(FOREGROUND_GREEN,"Press any key to continue.");
-    if(getch()==224) getch();
+    if(getch()==224)
+        getch();
 }
