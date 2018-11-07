@@ -227,7 +227,6 @@ void printTable(RecList* toPrint)
     printf("\n");
     for(int i =0; i<toPrint->listSize; i++)
     {
-        //printf("| %-14s|%15d|%5d|\n+---------------+---------------+-----+\n",toPrint->data[i]->name, toPrint->data[i]->number, toPrint->data[i]->score);//column
         printf("| %-14s|%15d|",toPrint->data[i]->name, toPrint->data[i]->number);//column
         for(int j=0; j<subjectCount; j++)
         {
@@ -415,7 +414,8 @@ void searchByNum(RecList* table)
         {
             if(table->data[i]->number == criteria)
             {
-                printf("Record Found: %s, N0.%d, score:\n",table->data[i]->name, table->data[i]->number);
+                colorPrinter(FOREGROUND_GREEN, "Record Found: ");
+                printf("%s, N0.%d, score:\n",table->data[i]->name, table->data[i]->number);
                 for(int j=0; j<subjectCount; j++)
                 {
                     printf("\t%15s: %d\n", subjectName[j], table->data[i]->score[j]);

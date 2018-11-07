@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1541560108 source:c:\users\administrator\desktop\scoremanage\scoremanage\main.c
+1541563936 source:c:\users\administrator\desktop\scoremanage\scoremanage\main.c
 	<header.h>
 	<functions.c>
 
@@ -10,6 +10,6 @@
 	<stdlib.h>
 	<string.h>
 
-1541560379 c:\users\administrator\desktop\scoremanage\scoremanage\\functions.c
+1541563900 c:\users\administrator\desktop\scoremanage\scoremanage\\functions.c
 	<header.h>
 

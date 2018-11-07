@@ -26,24 +26,19 @@ char* funcList[] = {"1  Input record",
 int main()
 {
     printf("Number: 180110618\nSubject: 5 - Program 1\n\n");
-    int input, screenShotMode, curList = 0,initFlag=0;
-    char ssm,rf;
+    int input, curList = 0,initFlag=0;
+    char rf;
     RecList* myList = listConstructor();
 
     hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
     GetConsoleScreenBufferInfo(hConsole, &consoleInfo);
     saved_attributes = consoleInfo.wAttributes;
 
-    printf("Screen shot mode?(never clear output) [y/N]");
-    scanf("%c", &ssm);
-    screenShotMode = (ssm=='y'||ssm=='Y');
-
     printf("Do you wish to read from file?[y/N]");
     fflush(stdin);
-    scanf("%c", &rf);
+    rf = getch();
     if(rf!='y'&&rf!='Y')
     {
-        initFlag=1;
         printf("Please input subject count: ");
         safeNumInput(&subjectCount);
 
@@ -59,16 +54,14 @@ int main()
     }
     else
     {
+        system("cls");
         readFromFile(myList);
-        initFlag = 1;
+        initFlag=1;
     }
     while(1)
     {
-        if(!screenShotMode)
-        {
-            pause();
-            system("cls");
-        }
+        pause();
+        system("cls");
         while(1)
         {
             system("cls");
@@ -109,7 +102,8 @@ int main()
             else
             {
                 colorPrinter(FOREGROUND_GREEN, "BYE!");
-                system("pause");
+                fflush(stdin);
+                getchar();
                 return 0;
             }
         }
@@ -122,10 +116,8 @@ int main()
             printf("please init the table first!\n");
             continue;
         }
-        if(!screenShotMode)
-        {
-            system("cls");
-        }
+        system("cls");
+        printf("Number: 180110618\nSubject: 5 - Program 1\n\n");
         (*func[input])(myList);
     }
     listDeconstructor(myList);
